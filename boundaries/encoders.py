@@ -17,11 +17,11 @@ class DjangoOverRideJSONEncoder(DjangoJSONEncoder):
                 r = r[:-6] + 'Z'
             return r
         elif isinstance(o, datetime.date):
-            return o.isoformat(' ')
+            return o.isoformat()
         elif isinstance(o, datetime.time):
             if is_aware(o):
                 raise ValueError("JSON can't represent timezone-aware times.")
-            r = o.isoformat(' ')
+            r = o.isoformat()
             if o.microsecond:
                 r = r[:12]
             return r
