@@ -14,7 +14,19 @@ from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.six import binary_type, string_types, text_type
 from django.utils.translation import ugettext as _, ugettext_lazy
-from encoders import DjangoOverRideJSONEncoder
+# Override the encoder for JSONField if django version is sufficient
+from distutils.version import LooseVersion
+from django import __version__
+
+if LooseVersion(__version__) < LooseVersion("1.11.0"):
+    from encoders import DjangoOverRideJSONEncoder
+    from django.conf.settings import BOUNDARIES_JSON_ENCODER_OVERRIDE
+    if BOUNDARIES_JSON_ENCODER_OVERRIDE:
+        set_encoder = {'encoder': BOUNDARIES_JSON_ENCODER_OVERRIDE}
+    else:
+        set_encoder = {'encoder': DjangoOverRideJSONEncoder}
+else:
+    set_encoder = {}
 
 
 class MyAppConf(AppConf):
@@ -61,14 +73,14 @@ class BoundarySet(models.Model):
         help_text=ugettext_lazy('Free-form text notes, often used to describe changes that were made to the original source data.'))
     licence_url = models.URLField(blank=True,
         help_text=ugettext_lazy('A URL to the licence under which the data is made available.'))
-    extent = JSONField(blank=True, null=True, encoder=DjangoOverRideJSONEncoder,
-        help_text=ugettext_lazy("The set's boundaries' bounding box as a list like [xmin, ymin, xmax, ymax] in EPSG:4326."))
+    extent = JSONField(blank=True, null=True,
+        help_text=ugettext_lazy("The set's boundaries' bounding box as a list like [xmin, ymin, xmax, ymax] in EPSG:4326."), **set_encoder)
     start_date = models.DateField(blank=True, null=True,
         help_text=ugettext_lazy("The date from which the set's boundaries are in effect."))
     end_date = models.DateField(blank=True, null=True,
         help_text=ugettext_lazy("The date until which the set's boundaries are in effect."))
-    extra = JSONField(default={}, blank=True, encoder=DjangoOverRideJSONEncoder,
-        help_text=ugettext_lazy("Any additional metadata."))
+    extra = JSONField(default={}, blank=True,
+        help_text=ugettext_lazy("Any additional metadata."), **set_encoder)
 
     name_plural = property(lambda s: s.name)
     name_singular = property(lambda s: s.singular)
@@ -141,16 +153,16 @@ class Boundary(models.Model):
         help_text=ugettext_lazy("An identifier of the boundary, which should be unique within the set."))
     name = models.CharField(max_length=192, db_index=True,
         help_text=ugettext_lazy('The name of the boundary.'))
-    metadata = JSONField(default={}, blank=True, encoder=DjangoOverRideJSONEncoder,
-        help_text=ugettext_lazy('The attributes of the boundary from the shapefile, as a dictionary.'))
+    metadata = JSONField(default={}, blank=True,
+        help_text=ugettext_lazy('The attributes of the boundary from the shapefile, as a dictionary.'), **set_encoder)
     shape = models.MultiPolygonField(
         help_text=ugettext_lazy('The geometry of the boundary in EPSG:4326.'))
     simple_shape = models.MultiPolygonField(
         help_text=ugettext_lazy('The simplified geometry of the boundary in EPSG:4326.'))
     centroid = models.PointField(null=True,
         help_text=ugettext_lazy('The centroid of the boundary in EPSG:4326.'))
-    extent = JSONField(blank=True, null=True, encoder=DjangoOverRideJSONEncoder,
-        help_text=ugettext_lazy('The bounding box of the boundary as a list like [xmin, ymin, xmax, ymax] in EPSG:4326.'))
+    extent = JSONField(blank=True, null=True,
+        help_text=ugettext_lazy('The bounding box of the boundary as a list like [xmin, ymin, xmax, ymax] in EPSG:4326.'), **set_encoder)
     label_point = models.PointField(blank=True, null=True, spatial_index=False,
         help_text=ugettext_lazy('The point at which to place a label for the boundary in EPSG:4326, used by represent-maps.'))
     start_date = models.DateField(blank=True, null=True,
