@@ -18,13 +18,14 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from distutils.version import LooseVersion
 from django import __version__
 
-if LooseVersion(__version__) < LooseVersion("1.11.0"):
+if LooseVersion(__version__) > LooseVersion("1.11.0"):
     from encoders import DjangoOverRideJSONEncoder
-    from django.conf.settings import BOUNDARIES_JSON_ENCODER_OVERRIDE
-    if BOUNDARIES_JSON_ENCODER_OVERRIDE:
-        set_encoder = {'encoder': BOUNDARIES_JSON_ENCODER_OVERRIDE}
+    from django.conf import settings
+    if settings.BOUNDARIES_JSON_ENCODER_OVERRIDE:
+        set_encoder = {'encoder': settings.BOUNDARIES_JSON_ENCODER_OVERRIDE}
     else:
         set_encoder = {'encoder': DjangoOverRideJSONEncoder}
+
 else:
     set_encoder = {}
 
