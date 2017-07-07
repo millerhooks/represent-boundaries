@@ -21,7 +21,7 @@ from django import __version__
 if LooseVersion(__version__) > LooseVersion("1.11.0"):
     from encoders import DjangoOverRideJSONEncoder
     from django.conf import settings
-    if settings.BOUNDARIES_JSON_ENCODER_OVERRIDE:
+    if hasattr(settings, 'BOUNDARIES_JSON_ENCODER_OVERRIDE'):
         set_encoder = {'encoder': settings.BOUNDARIES_JSON_ENCODER_OVERRIDE}
     else:
         set_encoder = {'encoder': DjangoOverRideJSONEncoder}
