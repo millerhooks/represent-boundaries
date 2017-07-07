@@ -3,3 +3,4 @@
 *_cleaned_*
 /dist
 /.coverage
+.idea
