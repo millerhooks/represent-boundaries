@@ -51,10 +51,10 @@ class Command(BaseCommand):
         return '0.9.1'
 
     def handle(self, *args, **options):
-        if settings.DEBUG:
-            print(_('DEBUG is True. This can cause memory usage to balloon. Continue? [y/n]'))
-            if six.moves.input().lower() != 'y':
-                return
+        #if settings.DEBUG:
+            #print(_('DEBUG is True. This can cause memory usage to balloon. Continue? [y/n]'))
+            #if six.moves.input().lower() != 'y':
+        #        return
 
         boundaries.autodiscover(options['data_dir'])
 
@@ -79,7 +79,7 @@ class Command(BaseCommand):
                 definition.setdefault('name', name)
                 definition = Definition(definition)
 
-                data_sources, tmpdirs = create_data_sources(definition['file'], encoding=definition['encoding'], convert_3d_to_2d=options['clean'])
+                data_sources, tmpdirs = create_data_sources(definition['file'], encoding=definition['encoding'], convert_3d_to_2d=True)
 
                 try:
                     if not data_sources:

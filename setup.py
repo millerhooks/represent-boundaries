@@ -20,6 +20,7 @@ setup(
     ],
     install_requires=[
         'django-appconf',
+        'django-spillway'
     ],
     extras_require={
         'test': 'testfixtures',

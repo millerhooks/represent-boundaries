@@ -16,6 +16,7 @@ from django.utils.six import binary_type, string_types, text_type
 from django.utils.translation import ugettext as _, ugettext_lazy
 # Override the encoder for JSONField if django version is sufficient
 from distutils.version import LooseVersion
+from spillway.query import GeoQuerySet
 from django import __version__
 
 if LooseVersion(__version__) > LooseVersion("1.11.0"):
@@ -173,6 +174,8 @@ class Boundary(models.Model):
 
     api_fields = ['boundary_set_name', 'name', 'metadata', 'external_id', 'extent', 'centroid', 'start_date', 'end_date']
     api_fields_doc_from = {'boundary_set_name': 'set_name'}
+
+    objects = GeoQuerySet.as_manager()
 
     class Meta:
         unique_together = (('slug', 'set'))
